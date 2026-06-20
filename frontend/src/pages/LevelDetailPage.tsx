@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { runCCode, submitLevel } from "../api/code";
 import { fetchLevelDetail } from "../api/levels";
 import { ActionButtons } from "../components/ActionButtons";
 import { CodeEditorPanel } from "../components/CodeEditorPanel";
 import { GameMap, type GameMapStatus } from "../components/GameMap";
 import { HintPanel } from "../components/HintPanel";
-import { ResultPanel, type RunResult } from "../components/ResultPanel";
+import { ResultPanel, type ResultPanelResult } from "../components/ResultPanel";
 import type { LevelDetail } from "../types/level";
+
+const networkErrorMessage = "无法连接后端，请确认 npm run dev 正在运行。";
 
 export function LevelDetailPage() {
   const { id } = useParams();
@@ -14,10 +17,13 @@ export function LevelDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [code, setCode] = useState("");
-  const [result, setResult] = useState<RunResult | null>(null);
+  const [customStdin, setCustomStdin] = useState("");
+  const [result, setResult] = useState<ResultPanelResult | null>(null);
   const [visibleHintCount, setVisibleHintCount] = useState(0);
   const [hasRequestedExtraHint, setHasRequestedExtraHint] = useState(false);
   const [mapStatus, setMapStatus] = useState<GameMapStatus>("idle");
+  const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -33,6 +39,7 @@ export function LevelDetailPage() {
         if (isMounted) {
           setLevel(data);
           setCode(data.starterCode);
+          setCustomStdin(data.sampleInput);
           setResult(null);
           setVisibleHintCount(0);
           setHasRequestedExtraHint(false);
@@ -60,21 +67,58 @@ export function LevelDetailPage() {
     };
   }, [id]);
 
-  function handleRun() {
-    setResult({
-      status: "模拟运行",
-      message: "运行请求已记录",
-      output: "当前阶段尚未接入 C 编译运行"
-    });
+  async function handleRun() {
+    setIsRunning(true);
+    setResult(null);
     setMapStatus("running");
+
+    try {
+      const runResult = await runCCode(code, customStdin);
+
+      setResult({
+        kind: "run",
+        data: runResult
+      });
+      setMapStatus(runResult.status === "success" ? "success" : "error");
+    } catch {
+      setResult({
+        kind: "network_error",
+        source: "run",
+        message: networkErrorMessage
+      });
+      setMapStatus("error");
+    } finally {
+      setIsRunning(false);
+    }
   }
 
-  function handleSubmit() {
-    setResult({
-      status: "模拟提交",
-      message: "第四阶段将接入后端判题"
-    });
-    setMapStatus("success");
+  async function handleSubmit() {
+    if (!id) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setResult(null);
+    setMapStatus("running");
+
+    try {
+      const submitResult = await submitLevel(id, code);
+
+      setResult({
+        kind: "submit",
+        data: submitResult
+      });
+      setMapStatus(submitResult.passed ? "success" : "error");
+    } catch {
+      setResult({
+        kind: "network_error",
+        source: "submit",
+        message: networkErrorMessage
+      });
+      setMapStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleReset() {
@@ -167,11 +211,24 @@ export function LevelDetailPage() {
 
         <div className="lab-right">
           <CodeEditorPanel code={code} onCodeChange={setCode} />
+          <section className="workspace-panel stdin-panel">
+            <div className="panel-heading">
+              <h2>自定义输入</h2>
+            </div>
+            <textarea
+              aria-label="自定义输入"
+              value={customStdin}
+              onChange={(event) => setCustomStdin(event.target.value)}
+              placeholder="没有输入时可以留空"
+            />
+          </section>
           <ActionButtons
             onRun={handleRun}
             onSubmit={handleSubmit}
             onReset={handleReset}
             onHint={handleHint}
+            isRunning={isRunning}
+            isSubmitting={isSubmitting}
           />
           <ResultPanel result={result} />
           <HintPanel
