@@ -134,7 +134,7 @@ int main(void) {
         expectedOutput: "close"
       },
       {
-        name: "边界电量",
+        name: "隐藏测试：边界值 60",
         input: "60",
         expectedOutput: "open",
         hidden: true
