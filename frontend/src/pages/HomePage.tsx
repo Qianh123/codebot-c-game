@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { CodeEditorPlaceholder } from "../components/CodeEditorPlaceholder";
 
 export function HomePage() {
@@ -9,10 +10,10 @@ export function HomePage() {
           <h1 id="home-title">CodeBot C 编程实验室</h1>
           <p className="intro">用 C 语言控制机器人闯关的编程教学游戏</p>
           <nav className="hero-actions" aria-label="主要导航">
-            <button type="button">开始学习</button>
-            <button type="button" className="secondary">
+            <Link to="/levels">开始学习</Link>
+            <Link to="/levels" className="secondary">
               关卡列表
-            </button>
+            </Link>
           </nav>
         </div>
         <CodeEditorPlaceholder />
