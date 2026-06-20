@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchLevelDetail } from "../api/levels";
+import { ActionButtons } from "../components/ActionButtons";
+import { CodeEditorPanel } from "../components/CodeEditorPanel";
+import { GameMap, type GameMapStatus } from "../components/GameMap";
+import { HintPanel } from "../components/HintPanel";
+import { ResultPanel, type RunResult } from "../components/ResultPanel";
 import type { LevelDetail } from "../types/level";
 
 export function LevelDetailPage() {
@@ -8,7 +13,11 @@ export function LevelDetailPage() {
   const [level, setLevel] = useState<LevelDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isHintVisible, setIsHintVisible] = useState(false);
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState<RunResult | null>(null);
+  const [visibleHintCount, setVisibleHintCount] = useState(0);
+  const [hasRequestedExtraHint, setHasRequestedExtraHint] = useState(false);
+  const [mapStatus, setMapStatus] = useState<GameMapStatus>("idle");
 
   useEffect(() => {
     if (!id) {
@@ -23,6 +32,11 @@ export function LevelDetailPage() {
       .then((data) => {
         if (isMounted) {
           setLevel(data);
+          setCode(data.starterCode);
+          setResult(null);
+          setVisibleHintCount(0);
+          setHasRequestedExtraHint(false);
+          setMapStatus("idle");
         }
       })
       .catch((requestError) => {
@@ -45,6 +59,46 @@ export function LevelDetailPage() {
       isMounted = false;
     };
   }, [id]);
+
+  function handleRun() {
+    setResult({
+      status: "模拟运行",
+      message: "运行请求已记录",
+      output: "当前阶段尚未接入 C 编译运行"
+    });
+    setMapStatus("running");
+  }
+
+  function handleSubmit() {
+    setResult({
+      status: "模拟提交",
+      message: "第四阶段将接入后端判题"
+    });
+    setMapStatus("success");
+  }
+
+  function handleReset() {
+    if (!level) {
+      return;
+    }
+
+    setCode(level.starterCode);
+    setResult(null);
+    setMapStatus("idle");
+  }
+
+  function handleHint() {
+    if (!level) {
+      return;
+    }
+
+    if (visibleHintCount < level.hints.length) {
+      setVisibleHintCount((current) => current + 1);
+      return;
+    }
+
+    setHasRequestedExtraHint(true);
+  }
 
   if (isLoading) {
     return (
@@ -79,49 +133,54 @@ export function LevelDetailPage() {
         </div>
       </header>
 
-      <section className="detail-grid">
-        <article className="detail-section">
-          <h2>任务描述</h2>
-          <p>{level.description}</p>
-        </article>
+      <section className="lab-layout">
+        <div className="lab-left">
+          <GameMap status={mapStatus} />
 
-        <article className="detail-section">
-          <h2>输入格式</h2>
-          <p>{level.inputFormat}</p>
-        </article>
+          <article className="detail-section">
+            <h2>任务描述</h2>
+            <p>{level.description}</p>
+          </article>
 
-        <article className="detail-section">
-          <h2>输出格式</h2>
-          <p>{level.outputFormat}</p>
-        </article>
+          <article className="detail-section">
+            <h2>输入格式</h2>
+            <p>{level.inputFormat}</p>
+          </article>
 
-        <article className="detail-section">
-          <h2>示例输入</h2>
-          <pre>{level.sampleInput || "无输入"}</pre>
-        </article>
+          <article className="detail-section">
+            <h2>输出格式</h2>
+            <p>{level.outputFormat}</p>
+          </article>
 
-        <article className="detail-section">
-          <h2>示例输出</h2>
-          <pre>{level.sampleOutput}</pre>
-        </article>
+          <div className="sample-grid">
+            <article className="detail-section">
+              <h2>示例输入</h2>
+              <pre>{level.sampleInput || "无输入"}</pre>
+            </article>
 
-        <article className="detail-section code-section">
-          <h2>starterCode</h2>
-          <pre>
-            <code>{level.starterCode}</code>
-          </pre>
-        </article>
+            <article className="detail-section">
+              <h2>示例输出</h2>
+              <pre>{level.sampleOutput}</pre>
+            </article>
+          </div>
+        </div>
 
-        <article className="detail-section hint-section">
-          <h2>提示</h2>
-          {isHintVisible ? (
-            <p>{level.hints[0] ?? "当前关卡暂无提示。"}</p>
-          ) : (
-            <button type="button" onClick={() => setIsHintVisible(true)}>
-              点击提示查看第一条
-            </button>
-          )}
-        </article>
+        <div className="lab-right">
+          <CodeEditorPanel code={code} onCodeChange={setCode} />
+          <ActionButtons
+            onRun={handleRun}
+            onSubmit={handleSubmit}
+            onReset={handleReset}
+            onHint={handleHint}
+          />
+          <ResultPanel result={result} />
+          <HintPanel
+            visibleHints={level.hints.slice(0, visibleHintCount)}
+            noMoreHints={
+              hasRequestedExtraHint && visibleHintCount >= level.hints.length
+            }
+          />
+        </div>
       </section>
     </main>
   );

@@ -3,6 +3,22 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
+vi.mock("@monaco-editor/react", () => ({
+  default: ({
+    value,
+    onChange
+  }: {
+    value?: string;
+    onChange?: (value: string | undefined) => void;
+  }) => (
+    <textarea
+      aria-label="C 语言代码编辑器"
+      value={value ?? ""}
+      onChange={(event) => onChange?.(event.target.value)}
+    />
+  )
+}));
+
 const levelSummaries = [
   {
     id: "level-001",
@@ -113,7 +129,7 @@ describe("App", () => {
     expect(globalThis.fetch).toHaveBeenCalledWith("/api/levels");
   });
 
-  it("renders level detail from the backend and reveals the first hint on demand", async () => {
+  it("renders level detail with editor, simulated controls, and progressive hints", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       mockJsonResponse(levelDetail) as Response
     );
@@ -125,12 +141,44 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("输出一行 Hello CodeBot")).toBeInTheDocument();
     expect(screen.getByText("Hello CodeBot")).toBeInTheDocument();
-    expect(screen.getAllByText(/#include <stdio.h>/).length).toBeGreaterThan(0);
+    const editor = screen.getByLabelText("C 语言代码编辑器");
+    expect(editor).toHaveValue(levelDetail.starterCode);
     expect(screen.queryByText("使用 printf 输出固定文本。")).not.toBeInTheDocument();
+    expect(screen.getByText("等待运行")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "点击提示查看第一条" }));
+    fireEvent.change(editor, {
+      target: { value: "#include <stdio.h>\n\nint main(void) { return 0; }" }
+    });
+
+    expect(editor).toHaveValue("#include <stdio.h>\n\nint main(void) { return 0; }");
+
+    fireEvent.click(screen.getByRole("button", { name: "运行" }));
+
+    expect(screen.getByText("模拟运行")).toBeInTheDocument();
+    expect(screen.getByText("当前阶段尚未接入 C 编译运行")).toBeInTheDocument();
+    expect(screen.getByText("模拟运行中")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
+
+    expect(screen.getByText("模拟提交")).toBeInTheDocument();
+    expect(screen.getByText("第四阶段将接入后端判题")).toBeInTheDocument();
+    expect(screen.getByText("模拟成功")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "重置" }));
+
+    expect(editor).toHaveValue(levelDetail.starterCode);
+
+    fireEvent.click(screen.getByRole("button", { name: "提示" }));
 
     expect(screen.getByText("使用 printf 输出固定文本。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "提示" }));
+
+    expect(screen.getByText("注意输出内容大小写。")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "提示" }));
+
+    expect(screen.getByText("已经没有更多提示")).toBeInTheDocument();
     expect(globalThis.fetch).toHaveBeenCalledWith("/api/levels/level-001");
   });
 

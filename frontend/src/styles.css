@@ -208,7 +208,21 @@ h1 {
   border-bottom: 1px solid #d7dfd3;
 }
 
-.detail-grid {
+.lab-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.88fr) minmax(420px, 1.12fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.lab-left,
+.lab-right {
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.sample-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
@@ -231,17 +245,180 @@ h1 {
   line-height: 1.6;
 }
 
-.code-section,
-.hint-section {
-  grid-column: 1 / -1;
+.workspace-panel {
+  overflow: hidden;
+  border: 1px solid #d7dfd3;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
-.hint-section button {
-  margin-top: 12px;
-  min-height: 42px;
+.panel-heading {
+  min-height: 48px;
   padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #d7dfd3;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.panel-heading span {
+  color: #2f6f68;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.editor-panel {
+  min-height: 470px;
+}
+
+.editor-loading {
+  margin: 0;
+  min-height: 420px;
+  padding: 18px;
+  overflow: auto;
+  color: #dce8d7;
+  background: #101510;
+  line-height: 1.6;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-buttons button,
+.hint-panel button {
+  min-height: 44px;
+  padding: 0 14px;
   color: #ffffff;
   background: #2f6f68;
+}
+
+.action-buttons .secondary-action {
+  color: #172320;
+  background: #d8e1d3;
+}
+
+.result-content,
+.hint-panel {
+  padding-bottom: 16px;
+}
+
+.result-content,
+.result-panel > .muted-text,
+.hint-panel > .muted-text,
+.hint-panel ol,
+.hint-empty {
+  margin: 0;
+  padding: 16px;
+}
+
+.result-content strong {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #2f6f68;
+}
+
+.result-content p,
+.muted-text,
+.hint-panel li {
+  color: #4e5a4f;
+  line-height: 1.65;
+}
+
+.result-content pre {
+  margin: 12px 0 0;
+  padding: 14px;
+  overflow-x: auto;
+  color: #dce8d7;
+  background: #101510;
+  border-radius: 8px;
+}
+
+.hint-panel ol {
+  display: grid;
+  gap: 10px;
+}
+
+.hint-empty {
+  color: #8a5a1d;
+  font-weight: 700;
+}
+
+.game-map {
+  padding: 16px;
+  border: 1px solid #cdd8d2;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.map-status {
+  margin-bottom: 12px;
+  color: #2f6f68;
+  font-weight: 800;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.map-cell {
+  min-height: 72px;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d7dfd3;
+  border-radius: 8px;
+  color: #526057;
+  background: #f5f7f2;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.robot {
+  color: #ffffff;
+  background: #2f6f68;
+}
+
+.energy {
+  color: #173c38;
+  background: #d8e1d3;
+}
+
+.obstacle {
+  color: #ffffff;
+  background: #59625b;
+}
+
+.door {
+  color: #ffffff;
+  background: #5d6f9f;
+}
+
+.exit {
+  color: #ffffff;
+  background: #1f7a4d;
+}
+
+.game-map-running .robot {
+  outline: 3px solid #9fb7ff;
+}
+
+.game-map-success .exit {
+  outline: 3px solid #82c99d;
+}
+
+.game-map-error .obstacle {
+  outline: 3px solid #d98a8a;
 }
 
 .editor-placeholder {
@@ -292,7 +469,12 @@ h1 {
     flex: 1 1 140px;
   }
 
-  .detail-grid {
+  .lab-layout,
+  .sample-grid {
     grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
