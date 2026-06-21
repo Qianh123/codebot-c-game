@@ -68,8 +68,8 @@ describe("GET /api/levels/:id", () => {
     }
   });
 
-  it("first ten levels include complete explanations for self learning", async () => {
-    for (let index = 1; index <= 10; index += 1) {
+  it("all levels include complete explanations for self learning", async () => {
+    for (let index = 1; index <= 20; index += 1) {
       const levelId = `level-${String(index).padStart(3, "0")}`;
       const response = await request(app).get(`/api/levels/${levelId}`);
 
@@ -86,8 +86,14 @@ describe("GET /api/levels/:id", () => {
       );
       expect(response.body.explanation.concept.length).toBeGreaterThan(20);
       expect(response.body.explanation.syntax.length).toBeGreaterThan(10);
-      expect(response.body.explanation.executionSteps.length).toBeGreaterThanOrEqual(3);
-      expect(response.body.explanation.commonMistakes.length).toBeGreaterThanOrEqual(3);
+      const minimumListLength = index <= 10 ? 3 : 4;
+
+      expect(response.body.explanation.executionSteps.length).toBeGreaterThanOrEqual(
+        minimumListLength
+      );
+      expect(response.body.explanation.commonMistakes.length).toBeGreaterThanOrEqual(
+        minimumListLength
+      );
       expect(response.body.explanation.extraPractice.length).toBeGreaterThanOrEqual(2);
     }
   });

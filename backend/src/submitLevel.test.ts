@@ -1,6 +1,8 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { app } from "./app.js";
+import { levels } from "./data/levels.js";
+import { judgeLevelSubmission } from "./services/judge.js";
 
 const level001CorrectCode = `#include <stdio.h>
 
@@ -340,4 +342,34 @@ int main(){ printf("Hello CodeBot") return 0; }`
       passed: true
     });
   });
+
+  it(
+    "passes levels 011 to 020 with their explanation reference solutions",
+    async () => {
+      const targetLevels = levels.filter((level) => {
+        const numericId = Number(level.id.replace("level-", ""));
+
+        return numericId >= 11 && numericId <= 20;
+      });
+
+      expect(targetLevels).toHaveLength(10);
+
+      for (const level of targetLevels) {
+        expect(level.explanation?.referenceSolution).toContain("#include <stdio.h>");
+
+        const result = await judgeLevelSubmission(
+          level,
+          level.explanation?.referenceSolution ?? ""
+        );
+
+        expect(result, `${level.id} reference solution should pass`).toMatchObject({
+          passed: true,
+          score: 100,
+          errorType: null
+        });
+        expect(result.results).toHaveLength(level.tests.length);
+      }
+    },
+    30000
+  );
 });

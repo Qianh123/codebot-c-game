@@ -365,6 +365,422 @@ printf("%c", cmd);`,
       "输入温度，判断 hot、cold 或 normal。",
       "输入成绩，判断 pass 或 fail，并单独处理满分。"
     ]
+  },
+  "level-011": {
+    concept:
+      "本关练习在多个变量中找最大值。常用做法是先假设第一个数最大，再依次和后面的数比较，只要发现更大的数就更新最大值。",
+    syntax: `int max = a;
+if (b > max) {
+    max = b;
+}
+if (c > max) {
+    max = c;
+}`,
+    executionSteps: [
+      "读取三个整数 a、b、c。",
+      "用 a 初始化 max，表示当前已知最大值。",
+      "比较 b 和 max，如果 b 更大，就把 max 更新为 b。",
+      "继续比较 c 和 max，如果 c 更大，就把 max 更新为 c。",
+      "所有比较结束后，max 就是三个数中的最大值。"
+    ],
+    commonMistakes: [
+      "把 max 初始化为 0，遇到三个数都是负数时会出错。",
+      "只比较 a 和 b，忘记比较 c。",
+      "比较后没有更新 max，只是输出了某个固定变量。",
+      "没有考虑三个数相等或最大值重复的情况。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int a, b, c;
+    scanf("%d %d %d", &a, &b, &c);
+
+    int max = a;
+    if (b > max) {
+        max = b;
+    }
+    if (c > max) {
+        max = c;
+    }
+
+    printf("%d", max);
+    return 0;
+}`,
+    extraPractice: [
+      "输入三个整数，输出其中最小值。",
+      "输入四个整数，输出最大值。"
+    ]
+  },
+  "level-012": {
+    concept:
+      "else if 可以按顺序处理多个分数区间。本关从高分到低分判断，前面的条件不成立时才会继续检查后面的条件。",
+    syntax: `if (score >= 90) {
+    printf("A");
+} else if (score >= 80) {
+    printf("B");
+} else {
+    printf("E");
+}`,
+    executionSteps: [
+      "读取整数 score。",
+      "先判断 score >= 90，成立时输出 A 并跳过后续分支。",
+      "如果不是 A，再判断 score >= 80，成立时输出 B。",
+      "继续按 70、60 的边界判断 C 和 D。",
+      "所有及格区间都不满足时，说明低于 60，输出 E。"
+    ],
+    commonMistakes: [
+      "判断顺序从低到高写，导致 95 先命中 >= 60。",
+      "把边界写成 >，导致 90、80、70、60 这些分数分错等级。",
+      "忘记使用 else if，导致多个分支可能被连续判断。",
+      "输出了题目不要求的文字，例如 score=A。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int score;
+    scanf("%d", &score);
+
+    if (score >= 90) {
+        printf("A");
+    } else if (score >= 80) {
+        printf("B");
+    } else if (score >= 70) {
+        printf("C");
+    } else if (score >= 60) {
+        printf("D");
+    } else {
+        printf("E");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入年龄，按区间输出 child、teen 或 adult。",
+      "输入温度，按区间输出 cold、warm 或 hot。"
+    ]
+  },
+  "level-013": {
+    concept:
+      "闰年判断需要组合多个条件。能被 400 整除是闰年；不能被 100 整除但能被 4 整除也是闰年，其余是平年。",
+    syntax: `if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0)) {
+    printf("leap");
+} else {
+    printf("common");
+}`,
+    executionSteps: [
+      "读取整数 year。",
+      "用 year % 400 == 0 判断世纪闰年。",
+      "用 year % 4 == 0 && year % 100 != 0 判断普通闰年。",
+      "用 || 连接两种闰年情况，只要一种成立就输出 leap。",
+      "如果两个条件都不成立，输出 common。"
+    ],
+    commonMistakes: [
+      "只判断 year % 4 == 0，导致 1900 被误判为闰年。",
+      "把 && 和 || 的关系写反，导致逻辑条件错误。",
+      "忘记给组合条件加括号，读代码时难以确认优先级。",
+      "把取模运算 % 写成除法 /。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int year;
+    scanf("%d", &year);
+
+    if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0)) {
+        printf("leap");
+    } else {
+        printf("common");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入整数 n，判断它是否能被 3 或 5 整除。",
+      "输入年份，输出 1 表示闰年，输出 0 表示平年。"
+    ]
+  },
+  "level-014": {
+    concept:
+      "for 循环由初始化、循环条件和更新语句组成。本关用循环变量 i 从 1 走到 n，每次输出当前编号。",
+    syntax: `for (int i = 1; i <= n; i++) {
+    printf("%d", i);
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "循环变量 i 从 1 开始，表示当前要输出的数字。",
+      "每次循环前检查 i <= n，成立才执行循环体。",
+      "循环体中输出 i，并根据位置决定是否输出空格。",
+      "每次循环结束执行 i++，直到 i 大于 n。"
+    ],
+    commonMistakes: [
+      "把循环条件写成 i < n，导致漏掉 n。",
+      "从 i = 0 开始输出，导致多出 0 或整体偏移。",
+      "每个数字后都输出空格，可能造成格式不够严格。",
+      "忘记 i++，导致循环无法结束。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    for (int i = 1; i <= n; i++) {
+        if (i > 1) {
+            printf(" ");
+        }
+        printf("%d", i);
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入 n，输出 n 到 1。",
+      "输入 n，输出 1 到 n 中的偶数。"
+    ]
+  },
+  "level-015": {
+    concept:
+      "循环累加适合求一串数的总和。sum 保存当前累计结果，循环变量 i 表示正在加入的数字。",
+    syntax: `int sum = 0;
+for (int i = 1; i <= n; i++) {
+    sum += i;
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "把 sum 初始化为 0，表示还没有加任何数。",
+      "让 i 从 1 循环到 n。",
+      "每次循环执行 sum += i，把当前数字加入总和。",
+      "循环结束后输出 sum。"
+    ],
+    commonMistakes: [
+      "sum 没有初始化，导致结果不可预测。",
+      "循环条件写成 i < n，漏加最后一个 n。",
+      "把 sum += i 写成 sum = i，导致只保留最后一次的值。",
+      "没有考虑 n = 0 时循环不执行，sum 应保持为 0。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    int sum = 0;
+    for (int i = 1; i <= n; i++) {
+        sum += i;
+    }
+
+    printf("%d", sum);
+    return 0;
+}`,
+    extraPractice: [
+      "输入 n，输出 1 到 n 中所有偶数的和。",
+      "输入 n，输出 1 到 n 的平方和。"
+    ]
+  },
+  "level-016": {
+    concept:
+      "阶乘 n! 表示从 1 连乘到 n。求阶乘和求和类似，只是把累加改成累乘，结果初始值应为 1。",
+    syntax: `int result = 1;
+for (int i = 1; i <= n; i++) {
+    result *= i;
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "把 result 初始化为 1，因为乘法的单位值是 1。",
+      "让循环变量 i 从 1 走到 n。",
+      "每次循环执行 result *= i，把当前数字乘入结果。",
+      "如果 n 为 0，循环不会执行，result 仍为 1，符合 0! = 1。"
+    ],
+    commonMistakes: [
+      "把 result 初始化为 0，导致结果永远是 0。",
+      "循环从 0 开始乘，导致结果变成 0。",
+      "把 result *= i 写成 result += i，混淆阶乘和求和。",
+      "忘记处理 0!，错误输出 0。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    int result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+
+    printf("%d", result);
+    return 0;
+}`,
+    extraPractice: [
+      "输入 n，输出 2 到 n 的连乘积。",
+      "输入 n，输出 1! + 2! + ... + n!。"
+    ]
+  },
+  "level-017": {
+    concept:
+      "素数是大于 1 且只能被 1 和自身整除的整数。判断素数时，可以用循环尝试寻找 2 到根号 n 范围内的因子。",
+    syntax: `int isPrime = 1;
+for (int i = 2; i * i <= n; i++) {
+    if (n % i == 0) {
+        isPrime = 0;
+    }
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "如果 n 小于 2，直接判定为 not prime。",
+      "先假设 n 是素数，用 isPrime = 1 记录状态。",
+      "用 i 从 2 开始尝试整除 n，循环条件可以写成 i * i <= n。",
+      "一旦发现 n % i == 0，就说明存在除 1 和自身以外的因子，标记为非素数。",
+      "根据 isPrime 输出 prime 或 not prime。"
+    ],
+    commonMistakes: [
+      "忘记处理 n = 1，错误输出 prime。",
+      "循环条件写错，漏掉 2 或漏掉平方根边界。",
+      "发现因子后仍然错误地把 isPrime 改回 1。",
+      "把 n % i == 0 写成 n / i == 0，混淆取模和除法。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    int isPrime = 1;
+    if (n < 2) {
+        isPrime = 0;
+    }
+
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            isPrime = 0;
+        }
+    }
+
+    if (isPrime) {
+        printf("prime");
+    } else {
+        printf("not prime");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入 n，输出 2 到 n 中所有素数的个数。",
+      "输入 n，判断 n 是否为合数。"
+    ]
+  },
+  "level-018": {
+    concept:
+      "数组可以保存多个同类型数据。数组下标从 0 开始，长度为 5 的数组合法下标是 0 到 4。本关用循环读入数组并累加求和。",
+    syntax: `int a[5];
+for (int i = 0; i < 5; i++) {
+    scanf("%d", &a[i]);
+    sum += a[i];
+}`,
+    executionSteps: [
+      "定义长度为 5 的 int 数组 a。",
+      "把 sum 初始化为 0。",
+      "循环变量 i 从 0 到 4，依次访问 a[0] 到 a[4]。",
+      "每次读取一个数组元素后，把 a[i] 加到 sum 中。",
+      "循环结束后输出 sum。"
+    ],
+    commonMistakes: [
+      "访问 a[5]，越过合法下标范围 0 到 4。",
+      "sum 没有初始化为 0。",
+      "循环条件写成 i <= 5，导致数组越界。",
+      "读取数组元素时忘记写 &a[i]。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int a[5];
+    int sum = 0;
+
+    for (int i = 0; i < 5; i++) {
+        scanf("%d", &a[i]);
+        sum += a[i];
+    }
+
+    printf("%d", sum);
+    return 0;
+}`,
+    extraPractice: [
+      "输入 5 个整数，输出其中正数的和。",
+      "输入 5 个整数，输出数组中偶数的个数。"
+    ]
+  },
+  "level-019": {
+    concept:
+      "求数组最小值时，应该先用数组中的真实元素初始化 min，再遍历剩余元素比较。数组下标从 0 开始，5 个元素是 a[0] 到 a[4]。",
+    syntax: `int min = a[0];
+for (int i = 1; i < 5; i++) {
+    if (a[i] < min) {
+        min = a[i];
+    }
+}`,
+    executionSteps: [
+      "定义长度为 5 的数组并读入 5 个整数。",
+      "用 a[0] 初始化 min，表示当前最小值。",
+      "让 i 从 1 遍历到 4，逐个检查剩余元素。",
+      "如果 a[i] 小于 min，就把 min 更新为 a[i]。",
+      "遍历结束后输出 min。"
+    ],
+    commonMistakes: [
+      "把 min 初始化为 0，遇到全是正数或全是负数时都可能出错。",
+      "从 i = 0 开始也可以，但要确保数组已经读入完成。",
+      "循环条件写成 i <= 5，访问了不存在的 a[5]。",
+      "比较方向写反成 a[i] > min，变成求最大值。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int a[5];
+
+    for (int i = 0; i < 5; i++) {
+        scanf("%d", &a[i]);
+    }
+
+    int min = a[0];
+    for (int i = 1; i < 5; i++) {
+        if (a[i] < min) {
+            min = a[i];
+        }
+    }
+
+    printf("%d", min);
+    return 0;
+}`,
+    extraPractice: [
+      "输入 5 个整数，输出最大值。",
+      "输入 5 个整数，输出最小值所在的下标。"
+    ]
+  },
+  "level-020": {
+    concept:
+      "数组循环右移表示末尾元素会回到开头。m 可能大于数组长度，所以要先对长度取模。输出第 i 个位置时，可以反推它来自原数组的哪个下标。",
+    syntax: `m = m % 5;
+int index = (i - m + 5) % 5;
+printf("%d", a[index]);`,
+    executionSteps: [
+      "读入长度为 5 的数组和右移位数 m。",
+      "计算 m = m % 5，把过大的移动次数化简到 0 到 4。",
+      "输出新数组第 i 个位置时，使用 (i - m + 5) % 5 找到原数组下标。",
+      "按 i 从 0 到 4 循环输出 5 个元素。",
+      "输出时在元素之间打印空格，避免最后多余格式影响阅读。"
+    ],
+    commonMistakes: [
+      "没有对 m 取模，m 大于 5 时结果错误。",
+      "下标公式少加 5，导致 i - m 为负数时取模结果不可靠。",
+      "混淆左移和右移，把方向写反。",
+      "访问 a[5] 或负下标，造成数组越界。",
+      "输出空格格式混乱，数字之间没有分隔。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int a[5];
+    int m;
+
+    for (int i = 0; i < 5; i++) {
+        scanf("%d", &a[i]);
+    }
+    scanf("%d", &m);
+
+    m = m % 5;
+    for (int i = 0; i < 5; i++) {
+        int index = (i - m + 5) % 5;
+        if (i > 0) {
+            printf(" ");
+        }
+        printf("%d", a[index]);
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入 5 个整数和 m，实现数组循环左移 m 位。",
+      "把数组长度改成 10，练习通用的循环右移写法。"
+    ]
   }
 };
 
@@ -709,6 +1125,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：全相等", input: "6 6 6", expectedOutput: "6", hidden: true },
       { name: "隐藏测试：负数比较", input: "-3 -9 -1", expectedOutput: "-1", hidden: true }
     ],
+    explanation: levelExplanations["level-011"],
     animationRules: [{ output: "8", action: "choose-max" }]
   },
   {
@@ -739,6 +1156,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：90 边界", input: "90", expectedOutput: "A", hidden: true },
       { name: "隐藏测试：60 边界", input: "60", expectedOutput: "D", hidden: true }
     ],
+    explanation: levelExplanations["level-012"],
     animationRules: [{ output: "A", action: "excellent" }]
   },
   {
@@ -769,6 +1187,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：世纪平年", input: "1900", expectedOutput: "common", hidden: true },
       { name: "隐藏测试：世纪闰年", input: "2000", expectedOutput: "leap", hidden: true }
     ],
+    explanation: levelExplanations["level-013"],
     animationRules: [{ output: "leap", action: "time-jump" }]
   },
   {
@@ -799,6 +1218,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：输出 1 到 3", input: "3", expectedOutput: "1 2 3", hidden: true },
       { name: "隐藏测试：输出 1 到 10", input: "10", expectedOutput: "1 2 3 4 5 6 7 8 9 10", hidden: true }
     ],
+    explanation: levelExplanations["level-014"],
     animationRules: [{ output: "1 2 3", action: "number-route" }]
   },
   {
@@ -829,6 +1249,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：n 为 0", input: "0", expectedOutput: "0", hidden: true },
       { name: "隐藏测试：前 100 项和", input: "100", expectedOutput: "5050", hidden: true }
     ],
+    explanation: levelExplanations["level-015"],
     animationRules: [{ output: "15", action: "sum-energy" }]
   },
   {
@@ -859,6 +1280,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：0 的阶乘", input: "0", expectedOutput: "1", hidden: true },
       { name: "隐藏测试：7 的阶乘", input: "7", expectedOutput: "5040", hidden: true }
     ],
+    explanation: levelExplanations["level-016"],
     animationRules: [{ output: "120", action: "power-core" }]
   },
   {
@@ -889,6 +1311,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：1 不是素数", input: "1", expectedOutput: "not prime", hidden: true },
       { name: "隐藏测试：2 是素数", input: "2", expectedOutput: "prime", hidden: true }
     ],
+    explanation: levelExplanations["level-017"],
     animationRules: [{ output: "prime", action: "prime-pass" }]
   },
   {
@@ -919,6 +1342,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：全为零", input: "0 0 0 0 0", expectedOutput: "0", hidden: true },
       { name: "隐藏测试：全为负数", input: "-1 -2 -3 -4 -5", expectedOutput: "-15", hidden: true }
     ],
+    explanation: levelExplanations["level-018"],
     animationRules: [{ output: "15", action: "sum-array" }]
   },
   {
@@ -949,6 +1373,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：全是负数", input: "-7 -2 -9 -4 -5", expectedOutput: "-9", hidden: true },
       { name: "隐藏测试：最小值重复", input: "6 1 1 2 3", expectedOutput: "1", hidden: true }
     ],
+    explanation: levelExplanations["level-019"],
     animationRules: [{ output: "2", action: "find-min-box" }]
   },
   {
@@ -980,6 +1405,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：右移零位", input: "1 2 3 4 5\n0", expectedOutput: "1 2 3 4 5", hidden: true },
       { name: "隐藏测试：m 大于长度", input: "1 2 3 4 5\n7", expectedOutput: "4 5 1 2 3", hidden: true }
     ],
+    explanation: levelExplanations["level-020"],
     animationRules: [{ output: "4 5 1 2 3", action: "rotate-array" }]
   }
 ];
