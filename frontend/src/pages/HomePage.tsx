@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { CodeEditorPlaceholder } from "../components/CodeEditorPlaceholder";
+import { getLevelTitle, levelCatalog } from "../data/levelCatalog";
+import { clearProgress, getProgressRecords } from "../utils/progressStorage";
 
 export function HomePage() {
   const coreFeatures = [
@@ -10,6 +12,23 @@ export function HomePage() {
     "错题本",
     "教师数据面板"
   ];
+  const progressRecords = getProgressRecords();
+  const completedCount = progressRecords.filter((record) => record.passed).length;
+  const completionRate = Math.round((completedCount / levelCatalog.length) * 100);
+  const recentRecord =
+    [...progressRecords].sort((left, right) =>
+      right.lastSubmittedAt.localeCompare(left.lastSubmittedAt)
+    )[0] ?? null;
+  const continueTarget = recentRecord
+    ? `/levels/${recentRecord.levelId}`
+    : "/levels";
+
+  function handleClearProgress() {
+    if (window.confirm("确认清空学习进度吗？此操作不会删除错题本。")) {
+      clearProgress();
+      window.location.reload();
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -25,6 +44,35 @@ export function HomePage() {
                 <li key={feature}>{feature}</li>
               ))}
             </ul>
+          </section>
+          <section className="home-progress-panel" aria-labelledby="home-progress-title">
+            <h2 id="home-progress-title">学习进度</h2>
+            <div className="home-progress-grid">
+              <div>
+                <span>总关卡数</span>
+                <strong>{levelCatalog.length}</strong>
+              </div>
+              <div>
+                <span>已完成关卡数</span>
+                <strong>{completedCount}</strong>
+              </div>
+              <div>
+                <span>当前完成率</span>
+                <strong>{completionRate}%</strong>
+              </div>
+              <div>
+                <span>最近学习关卡</span>
+                <strong>
+                  {recentRecord ? getLevelTitle(recentRecord.levelId) : "暂无记录"}
+                </strong>
+              </div>
+            </div>
+            <div className="home-progress-actions">
+              <Link to={continueTarget}>继续学习</Link>
+              <button type="button" onClick={handleClearProgress}>
+                清空学习进度
+              </button>
+            </div>
           </section>
           <nav className="hero-actions" aria-label="主要导航">
             <Link to="/levels">开始学习</Link>

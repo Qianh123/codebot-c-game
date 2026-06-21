@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { fetchLevelSummaries } from "../api/levels";
 import { LevelCard } from "../components/LevelCard";
 import type { LevelSummary } from "../types/level";
+import { getProgressForLevel } from "../utils/progressStorage";
 
 export function LevelListPage() {
   const [levels, setLevels] = useState<LevelSummary[]>([]);
@@ -50,7 +51,11 @@ export function LevelListPage() {
       {!isLoading && !error ? (
         <section className="level-grid" aria-label="关卡">
           {levels.map((level) => (
-            <LevelCard key={level.id} level={level} />
+            <LevelCard
+              key={level.id}
+              level={level}
+              progress={getProgressForLevel(level.id)}
+            />
           ))}
         </section>
       ) : null}

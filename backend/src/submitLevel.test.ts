@@ -74,6 +74,68 @@ int main()
     return 0;
 }`;
 
+const level006CorrectCode = `#include <stdio.h>
+
+int main()
+{
+    int a, b;
+    scanf("%d %d", &a, &b);
+    printf("%d", a + b);
+    return 0;
+}`;
+
+const level013CorrectCode = `#include <stdio.h>
+
+int main()
+{
+    int year;
+    scanf("%d", &year);
+
+    if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0))
+    {
+        printf("leap");
+    }
+    else
+    {
+        printf("common");
+    }
+
+    return 0;
+}`;
+
+const level020CorrectCode = `#include <stdio.h>
+
+int main()
+{
+    int a[5];
+    int result[5];
+    int m;
+
+    for (int i = 0; i < 5; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+
+    scanf("%d", &m);
+    m = m % 5;
+
+    for (int i = 0; i < 5; i++)
+    {
+        result[(i + m) % 5] = a[i];
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        if (i > 0)
+        {
+            printf(" ");
+        }
+        printf("%d", result[i]);
+    }
+
+    return 0;
+}`;
+
 describe("POST /api/submit-level", () => {
   it("passes level-001 with correct code", async () => {
     const response = await request(app).post("/api/submit-level").send({
@@ -88,7 +150,7 @@ describe("POST /api/submit-level", () => {
       errorType: null,
       message: "全部测试通过"
     });
-    expect(response.body.results).toHaveLength(1);
+    expect(response.body.results).toHaveLength(4);
     expect(response.body.results[0]).toMatchObject({
       name: "输出问候",
       hidden: false,
@@ -109,8 +171,8 @@ describe("POST /api/submit-level", () => {
     expect(response.status).toBe(200);
     expect(response.body.passed).toBe(true);
     expect(response.body.score).toBe(100);
-    expect(response.body.results).toHaveLength(3);
-    expect(response.body.results.at(-1)).toMatchObject({
+    expect(response.body.results).toHaveLength(4);
+    expect(response.body.results[2]).toMatchObject({
       name: "隐藏测试：边界值 60",
       hidden: true,
       passed: true,
@@ -130,11 +192,11 @@ describe("POST /api/submit-level", () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       passed: false,
-      score: 67,
+      score: 75,
       errorType: "wrong_answer",
       message: "部分测试未通过"
     });
-    expect(response.body.results.at(-1)).toMatchObject({
+    expect(response.body.results[2]).toMatchObject({
       name: "隐藏测试：边界值 60",
       hidden: true,
       passed: false,
@@ -220,6 +282,62 @@ int main(){ printf("Hello CodeBot") return 0; }`
       errorType: null,
       message: "全部测试通过"
     });
-    expect(response.body.results).toHaveLength(2);
+    expect(response.body.results).toHaveLength(4);
+  });
+
+  it("passes level-006 with two-number sum code", async () => {
+    const response = await request(app).post("/api/submit-level").send({
+      levelId: "level-006",
+      code: level006CorrectCode
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      passed: true,
+      score: 100,
+      errorType: null,
+      message: "全部测试通过"
+    });
+    expect(response.body.results).toHaveLength(4);
+  });
+
+  it("passes level-013 with leap-year boundary code", async () => {
+    const response = await request(app).post("/api/submit-level").send({
+      levelId: "level-013",
+      code: level013CorrectCode
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      passed: true,
+      score: 100,
+      errorType: null,
+      message: "全部测试通过"
+    });
+    expect(response.body.results.at(-1)).toMatchObject({
+      input: "2000",
+      expectedOutput: "leap",
+      passed: true
+    });
+  });
+
+  it("passes level-020 with right-rotation array code", async () => {
+    const response = await request(app).post("/api/submit-level").send({
+      levelId: "level-020",
+      code: level020CorrectCode
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      passed: true,
+      score: 100,
+      errorType: null,
+      message: "全部测试通过"
+    });
+    expect(response.body.results.at(-1)).toMatchObject({
+      input: "1 2 3 4 5\n7",
+      expectedOutput: "4 5 1 2 3",
+      passed: true
+    });
   });
 });

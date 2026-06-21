@@ -15,15 +15,15 @@ describe("GET /api/health", () => {
 });
 
 describe("GET /api/levels", () => {
-  it("returns five level summaries without heavy fields", async () => {
+  it("returns twenty level summaries without heavy fields", async () => {
     const response = await request(app).get("/api/levels");
 
     expect(response.status).toBe(200);
-    expect(response.body).toHaveLength(5);
+    expect(response.body).toHaveLength(20);
     expect(response.body[0]).toMatchObject({
       id: "level-001",
       title: "启动 CodeBot",
-      chapter: "第一章：输出",
+      chapter: "第一章：输入输出与变量",
       knowledgePoint: "printf 输出",
       difficulty: "入门"
     });
@@ -44,9 +44,28 @@ describe("GET /api/levels/:id", () => {
       sampleOutput: "Hello CodeBot"
     });
     expect(response.body.starterCode).toContain("#include <stdio.h>");
-    expect(response.body.hints).toHaveLength(2);
-    expect(response.body.tests).toHaveLength(1);
+    expect(response.body.hints.length).toBeGreaterThanOrEqual(4);
+    expect(response.body.tests.length).toBeGreaterThanOrEqual(4);
     expect(response.body.animationRules).toHaveLength(1);
+  });
+
+  it("all levels have complete learning metadata and test coverage", async () => {
+    const listResponse = await request(app).get("/api/levels");
+
+    expect(listResponse.status).toBe(200);
+
+    for (const summary of listResponse.body) {
+      const detailResponse = await request(app).get(`/api/levels/${summary.id}`);
+
+      expect(detailResponse.status).toBe(200);
+      expect(detailResponse.body.hints.length).toBeGreaterThanOrEqual(4);
+      expect(detailResponse.body.tests.length).toBeGreaterThanOrEqual(4);
+      expect(detailResponse.body.tests.some((test: { hidden?: boolean }) => test.hidden)).toBe(
+        true
+      );
+      expect(detailResponse.body.animationRules.length).toBeGreaterThanOrEqual(1);
+      expect(detailResponse.body.starterCode).toContain("#include <stdio.h>");
+    }
   });
 
   it("returns 404 when the level does not exist", async () => {

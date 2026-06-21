@@ -15,6 +15,10 @@ import { ResultPanel, type ResultPanelResult } from "../components/ResultPanel";
 import type { LevelDetail } from "../types/level";
 import { generateErrorDiagnosis } from "../utils/errorDiagnosis";
 import { saveMistake } from "../utils/mistakes";
+import {
+  getProgressForLevel,
+  updateProgressAfterSubmit
+} from "../utils/progressStorage";
 
 const networkErrorMessage = "无法连接后端，请确认 npm run dev 正在运行。";
 
@@ -51,6 +55,7 @@ export function LevelDetailPage() {
   const [mapStatus, setMapStatus] = useState<GameMapStatus>("idle");
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasRestoredLastCode, setHasRestoredLastCode] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -64,12 +69,15 @@ export function LevelDetailPage() {
     fetchLevelDetail(id)
       .then((data) => {
         if (isMounted) {
+          const savedProgress = getProgressForLevel(data.id);
+
           setLevel(data);
-          setCode(data.starterCode);
+          setCode(savedProgress?.lastCode ?? data.starterCode);
           setCustomStdin(data.sampleInput);
           setResult(null);
           setVisibleHintCount(0);
           setHasRequestedExtraHint(false);
+          setHasRestoredLastCode(Boolean(savedProgress?.lastCode));
           setMapStatus("idle");
         }
       })
@@ -138,6 +146,15 @@ export function LevelDetailPage() {
       });
       setMapStatus(submitResult.passed ? "success" : "error");
 
+      if (level) {
+        updateProgressAfterSubmit({
+          levelId: level.id,
+          passed: submitResult.passed,
+          score: submitResult.score,
+          code
+        });
+      }
+
       if (!submitResult.passed && level) {
         const diagnosis = generateErrorDiagnosis({
           errorType: submitResult.errorType ?? "wrong_answer",
@@ -194,6 +211,7 @@ export function LevelDetailPage() {
 
     setCode(level.starterCode);
     setResult(null);
+    setHasRestoredLastCode(false);
     setMapStatus("idle");
   }
 
@@ -283,6 +301,9 @@ export function LevelDetailPage() {
 
         <div className="lab-right">
           <CodeEditorPanel code={code} onCodeChange={setCode} />
+          {hasRestoredLastCode ? (
+            <p className="status-text">已恢复上次提交的代码。</p>
+          ) : null}
           <section className="workspace-panel stdin-panel">
             <div className="panel-heading">
               <h2>自定义输入</h2>

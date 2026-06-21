@@ -59,6 +59,126 @@ const levelSummaries = [
     knowledgePoint: "数组、循环、最大值",
     difficulty: "进阶",
     description: "输入 5 个整数，输出最大值。"
+  },
+  {
+    id: "level-006",
+    title: "双数能量合并",
+    chapter: "第一章：输入输出与变量",
+    knowledgePoint: "int、scanf、printf、加法",
+    difficulty: "入门",
+    description: "输入两个整数，输出它们的和。"
+  },
+  {
+    id: "level-007",
+    title: "圆形能量场面积",
+    chapter: "第一章：输入输出与变量",
+    knowledgePoint: "double、格式化输出",
+    difficulty: "基础",
+    description: "输入半径，输出圆面积，保留两位小数。"
+  },
+  {
+    id: "level-008",
+    title: "读取指令字符",
+    chapter: "第一章：输入输出与变量",
+    knowledgePoint: "char、scanf、printf",
+    difficulty: "入门",
+    description: "输入一个字符并原样输出。"
+  },
+  {
+    id: "level-009",
+    title: "奇偶能量判断",
+    chapter: "第二章：条件判断",
+    knowledgePoint: "%、if else",
+    difficulty: "基础",
+    description: "输入整数，判断 odd 或 even。"
+  },
+  {
+    id: "level-010",
+    title: "正负能量检测",
+    chapter: "第二章：条件判断",
+    knowledgePoint: "if else if",
+    difficulty: "基础",
+    description: "输入整数，判断 positive、negative 或 zero。"
+  },
+  {
+    id: "level-011",
+    title: "三路最大能量",
+    chapter: "第二章：条件判断",
+    knowledgePoint: "多条件最大值",
+    difficulty: "基础",
+    description: "输入三个整数，输出最大值。"
+  },
+  {
+    id: "level-012",
+    title: "成绩等级门",
+    chapter: "第二章：条件判断",
+    knowledgePoint: "if else if、区间判断",
+    difficulty: "基础",
+    description: "输入成绩，输出 A、B、C、D 或 F。"
+  },
+  {
+    id: "level-013",
+    title: "闰年时钟",
+    chapter: "第二章：条件判断",
+    knowledgePoint: "逻辑运算、闰年规则",
+    difficulty: "进阶",
+    description: "输入年份，判断 leap 或 common。"
+  },
+  {
+    id: "level-014",
+    title: "编号路线输出",
+    chapter: "第三章：循环",
+    knowledgePoint: "for 循环",
+    difficulty: "基础",
+    description: "输入 n，输出 1 到 n。"
+  },
+  {
+    id: "level-015",
+    title: "前 n 项能量和",
+    chapter: "第三章：循环",
+    knowledgePoint: "循环累加",
+    difficulty: "基础",
+    description: "输入 n，输出 1 到 n 的和。"
+  },
+  {
+    id: "level-016",
+    title: "阶乘能量核心",
+    chapter: "第三章：循环",
+    knowledgePoint: "循环乘法",
+    difficulty: "基础",
+    description: "输入 n，输出 n 的阶乘。"
+  },
+  {
+    id: "level-017",
+    title: "素数通行证",
+    chapter: "第三章：循环",
+    knowledgePoint: "循环、取模、标记变量",
+    difficulty: "进阶",
+    description: "输入整数 n，判断 prime 或 not prime。"
+  },
+  {
+    id: "level-018",
+    title: "数组能量总和",
+    chapter: "第四章：数组",
+    knowledgePoint: "数组、循环、求和",
+    difficulty: "基础",
+    description: "输入 5 个整数，输出总和。"
+  },
+  {
+    id: "level-019",
+    title: "数组最小能量箱",
+    chapter: "第四章：数组",
+    knowledgePoint: "数组、循环、最小值",
+    difficulty: "基础",
+    description: "输入 5 个整数，输出最小值。"
+  },
+  {
+    id: "level-020",
+    title: "数组右移传送带",
+    chapter: "第四章：数组",
+    knowledgePoint: "数组、取模、循环移动",
+    difficulty: "挑战",
+    description: "输入 5 个整数和 m，输出右移 m 位后的数组。"
   }
 ];
 
@@ -145,6 +265,35 @@ describe("App", () => {
     expect(screen.getByText("错误诊断")).toBeInTheDocument();
     expect(screen.getAllByText("错题本").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("教师数据面板")).toBeInTheDocument();
+    expect(screen.getByText("总关卡数")).toBeInTheDocument();
+    expect(screen.getByText("已完成关卡数")).toBeInTheDocument();
+    expect(screen.getByText("当前完成率")).toBeInTheDocument();
+  });
+
+  it("shows learning progress on the home page", () => {
+    localStorage.setItem(
+      "codebot-progress",
+      JSON.stringify([
+        {
+          levelId: "level-003",
+          passed: true,
+          bestScore: 100,
+          submitCount: 2,
+          lastSubmittedAt: "2026-06-21T10:00:00.000Z",
+          lastCode: "int main(){return 0;}"
+        }
+      ])
+    );
+
+    renderRoute("/");
+
+    expect(screen.getByText("5%")).toBeInTheDocument();
+    expect(screen.getByText("最近学习关卡")).toBeInTheDocument();
+    expect(screen.getByText("能量门")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "继续学习" })).toHaveAttribute(
+      "href",
+      "/levels/level-003"
+    );
   });
 
   it("renders the teacher dashboard page", () => {
@@ -190,10 +339,35 @@ describe("App", () => {
     renderRoute("/levels");
 
     expect(await screen.findByRole("heading", { name: "关卡列表" })).toBeInTheDocument();
-    expect(document.querySelectorAll(".level-card")).toHaveLength(5);
+    expect(document.querySelectorAll(".level-card")).toHaveLength(20);
     expect(screen.getByText("启动 CodeBot")).toBeInTheDocument();
     expect(screen.getByText("仓库最大能量箱")).toBeInTheDocument();
     expect(globalThis.fetch).toHaveBeenCalledWith("/api/levels");
+  });
+
+  it("shows passed progress on level cards", async () => {
+    localStorage.setItem(
+      "codebot-progress",
+      JSON.stringify([
+        {
+          levelId: "level-003",
+          passed: true,
+          bestScore: 100,
+          submitCount: 2,
+          lastSubmittedAt: "2026-06-21T10:00:00.000Z",
+          lastCode: "int main(){return 0;}"
+        }
+      ])
+    );
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      mockJsonResponse(levelSummaries) as Response
+    );
+
+    renderRoute("/levels");
+
+    expect(await screen.findByText("已通过")).toBeInTheDocument();
+    expect(screen.getByText("最高分：100")).toBeInTheDocument();
+    expect(screen.getByText("提交次数：2")).toBeInTheDocument();
   });
 
   it("runs C code with custom stdin and submits the level to the judge API", async () => {
