@@ -3,6 +3,7 @@ import { HomePage } from "./pages/HomePage";
 import { LevelDetailPage } from "./pages/LevelDetailPage";
 import { LevelListPage } from "./pages/LevelListPage";
 import { MistakesPage } from "./pages/MistakesPage";
+import { TeacherDashboardPage } from "./pages/TeacherDashboardPage";
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Route path="/levels" element={<LevelListPage />} />
       <Route path="/levels/:id" element={<LevelDetailPage />} />
       <Route path="/mistakes" element={<MistakesPage />} />
+      <Route path="/teacher-dashboard" element={<TeacherDashboardPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

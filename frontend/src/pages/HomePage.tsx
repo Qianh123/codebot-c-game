@@ -17,6 +17,9 @@ export function HomePage() {
             <Link to="/mistakes" className="secondary">
               错题本
             </Link>
+            <Link to="/teacher-dashboard" className="secondary">
+              教师面板
+            </Link>
           </nav>
         </div>
         <CodeEditorPlaceholder />

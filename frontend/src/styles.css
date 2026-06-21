@@ -605,6 +605,146 @@ h1 {
   line-height: 1.6;
 }
 
+.teacher-dashboard {
+  max-width: 1180px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.overview-card,
+.dashboard-panel {
+  border: 1px solid #d7dfd3;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.overview-card {
+  min-height: 128px;
+  padding: 18px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+}
+
+.overview-card span {
+  color: #526057;
+  font-weight: 800;
+}
+
+.overview-card strong {
+  color: #101510;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dashboard-panel {
+  overflow: hidden;
+}
+
+.dashboard-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.analytics-table {
+  display: grid;
+}
+
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.4fr 0.6fr 0.8fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-top: 1px solid #e6ece2;
+  color: #445044;
+}
+
+.analytics-header {
+  color: #173c38;
+  background: #f5f7f2;
+  font-weight: 800;
+}
+
+.progress-cell {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.progress-bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d8e1d3;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2f6f68;
+}
+
+.metric-list {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.metric-item {
+  display: grid;
+  gap: 8px;
+}
+
+.metric-item div,
+.teaching-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-item strong {
+  color: #101510;
+}
+
+.metric-item span,
+.teaching-advice,
+.teaching-facts span {
+  color: #4e5a4f;
+}
+
+.teaching-advice {
+  margin: 0;
+  padding: 18px 18px 0;
+  line-height: 1.7;
+}
+
+.teaching-facts {
+  padding: 18px;
+}
+
+.teaching-facts span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #d8e1d3;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .editor-placeholder {
   overflow: hidden;
   border: 1px solid #26322e;
@@ -660,5 +800,14 @@ h1 {
 
   .action-buttons {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overview-grid,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-row {
+    grid-template-columns: 1fr;
   }
 }

@@ -134,6 +134,45 @@ describe("App", () => {
       "href",
       "/mistakes"
     );
+    expect(screen.getByRole("link", { name: "教师面板" })).toHaveAttribute(
+      "href",
+      "/teacher-dashboard"
+    );
+  });
+
+  it("renders the teacher dashboard page", () => {
+    renderRoute("/teacher-dashboard");
+
+    expect(screen.getByRole("heading", { name: "教师数据面板" })).toBeInTheDocument();
+    expect(screen.getByText("学生人数")).toBeInTheDocument();
+    expect(screen.getByText("总提交次数")).toBeInTheDocument();
+    expect(screen.getByText("平均通过率")).toBeInTheDocument();
+    expect(screen.getByText("最薄弱知识点")).toBeInTheDocument();
+  });
+
+  it("shows level pass rates, error distribution, and teaching advice", () => {
+    renderRoute("/teacher-dashboard");
+
+    expect(screen.getByRole("heading", { name: "关卡通过率" })).toBeInTheDocument();
+    expect(screen.getByText("启动 CodeBot")).toBeInTheDocument();
+    expect(screen.getByText("能量门")).toBeInTheDocument();
+    expect(screen.getAllByText("仓库最大能量箱").length).toBeGreaterThanOrEqual(1);
+
+    expect(screen.getByRole("heading", { name: "错误类型分布" })).toBeInTheDocument();
+    expect(screen.getByText("compile_error")).toBeInTheDocument();
+    expect(screen.getAllByText("wrong_answer").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("timeout")).toBeInTheDocument();
+    expect(screen.getByText("runtime_error")).toBeInTheDocument();
+
+    expect(screen.getByRole("heading", { name: "知识点掌握情况" })).toBeInTheDocument();
+    expect(screen.getAllByText("printf 输出").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("scanf 输入").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("if else 判断").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("for 循环").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("数组最大值").length).toBeGreaterThanOrEqual(1);
+
+    expect(screen.getByRole("heading", { name: "教学建议" })).toBeInTheDocument();
+    expect(screen.getByText(/建议重点讲解输出格式/)).toBeInTheDocument();
   });
 
   it("renders level summaries from the backend", async () => {
