@@ -4,19 +4,23 @@ import type {
   SubmitLevelErrorType,
   SubmitLevelResponse
 } from "../api/code";
+import { generateErrorDiagnosis } from "../utils/errorDiagnosis";
 
 export type ResultPanelResult =
   | {
       kind: "run";
       data: RunCResponse;
+      code: string;
     }
   | {
       kind: "submit";
       data: SubmitLevelResponse;
+      code: string;
     }
   | {
       kind: "network_error";
       source: "run" | "submit";
+      code?: string;
       message: string;
     };
 
@@ -53,6 +57,17 @@ function renderOutput(label: string, value: string) {
   );
 }
 
+function renderDiagnosis(diagnosis: string) {
+  return (
+    <div className="diagnosis-box">
+      <h3>错误诊断</h3>
+      {diagnosis.split("\n").map((line) => (
+        <p key={line}>{line}</p>
+      ))}
+    </div>
+  );
+}
+
 export function ResultPanel({ result }: ResultPanelProps) {
   const title =
     result?.kind === "submit" ||
@@ -74,6 +89,12 @@ export function ResultPanel({ result }: ResultPanelProps) {
         <div className="result-content result-error">
           <strong>network_error</strong>
           <p>{result.message}</p>
+          {renderDiagnosis(
+            generateErrorDiagnosis({
+              errorType: "network_error",
+              code: result.code
+            })
+          )}
         </div>
       ) : null}
 
@@ -81,8 +102,17 @@ export function ResultPanel({ result }: ResultPanelProps) {
         <div className="result-content">
           <strong>{result.data.status}</strong>
           <p>{runStatusMessages[result.data.status]}</p>
+          {result.data.status !== "success"
+            ? renderDiagnosis(
+                generateErrorDiagnosis({
+                  errorType: result.data.status,
+                  stderr: result.data.stderr,
+                  code: result.code
+                })
+              )
+            : null}
           {renderOutput("标准输出 stdout", result.data.stdout)}
-          {renderOutput("错误输出 stderr", result.data.stderr)}
+          {renderOutput("原始错误信息 stderr", result.data.stderr)}
           <p className="result-time">耗时：{result.data.timeMs}ms</p>
         </div>
       ) : null}
@@ -98,7 +128,18 @@ export function ResultPanel({ result }: ResultPanelProps) {
               <p>{submitErrorMessages[result.data.errorType]}</p>
             </>
           ) : null}
-          {renderOutput("错误输出 stderr", result.data.stderr ?? "")}
+          {!result.data.passed
+            ? renderDiagnosis(
+                generateErrorDiagnosis({
+                  errorType: result.data.errorType ?? "wrong_answer",
+                  stderr: result.data.stderr,
+                  code: result.code,
+                  message: result.data.message,
+                  results: result.data.results
+                })
+              )
+            : null}
+          {renderOutput("原始错误信息 stderr", result.data.stderr ?? "")}
 
           {result.data.results.length > 0 ? (
             <div className="judge-results">

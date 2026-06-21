@@ -14,6 +14,9 @@ export function HomePage() {
             <Link to="/levels" className="secondary">
               关卡列表
             </Link>
+            <Link to="/mistakes" className="secondary">
+              错题本
+            </Link>
           </nav>
         </div>
         <CodeEditorPlaceholder />

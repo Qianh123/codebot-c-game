@@ -35,6 +35,18 @@ export type SubmitLevelResponse = {
   stderr?: string;
 };
 
+export class ApiRequestError<T> extends Error {
+  status: number;
+  data: T;
+
+  constructor(status: number, data: T) {
+    super(`Request failed with status ${status}`);
+    this.name = "ApiRequestError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
 async function postJson<T>(url: string, payload: unknown): Promise<T> {
   const response = await fetch(url, {
     method: "POST",
@@ -47,7 +59,7 @@ async function postJson<T>(url: string, payload: unknown): Promise<T> {
   const data = (await response.json()) as T;
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    throw new ApiRequestError(response.status, data);
   }
 
   return data;

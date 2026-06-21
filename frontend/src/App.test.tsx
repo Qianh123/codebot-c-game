@@ -109,6 +109,7 @@ function renderRoute(path: string) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  localStorage.clear();
 });
 
 describe("App", () => {
@@ -128,6 +129,10 @@ describe("App", () => {
     expect(screen.getByRole("link", { name: "关卡列表" })).toHaveAttribute(
       "href",
       "/levels"
+    );
+    expect(screen.getByRole("link", { name: "错题本" })).toHaveAttribute(
+      "href",
+      "/mistakes"
     );
   });
 
@@ -270,6 +275,44 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows backend submit error bodies from non-2xx responses", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/levels/level-003") {
+        return mockJsonResponse(level003Detail) as Response;
+      }
+
+      if (url === "/api/submit-level") {
+        return mockJsonResponse(
+          {
+            passed: false,
+            score: 0,
+            errorType: "invalid_request",
+            message: "请提交 C 语言代码",
+            results: []
+          },
+          false,
+          400
+        ) as Response;
+      }
+
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    renderRoute("/levels/level-003");
+
+    expect(await screen.findByRole("heading", { name: "能量门" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "提交" }));
+
+    expect(await screen.findByText("提交判题结果")).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) => element?.textContent === "错误类型：invalid_request")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("network_error")).not.toBeInTheDocument();
+  });
+
   it("renders level detail with editor, reset, and progressive hints", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       mockJsonResponse(levelDetail) as Response
@@ -282,6 +325,10 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("输出一行 Hello CodeBot")).toBeInTheDocument();
     expect(screen.getByText("Hello CodeBot")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "错题本" })).toHaveAttribute(
+      "href",
+      "/mistakes"
+    );
     const editor = screen.getByLabelText("C 语言代码编辑器");
     expect(editor).toHaveValue(levelDetail.starterCode);
     expect(screen.queryByText("使用 printf 输出固定文本。")).not.toBeInTheDocument();
@@ -327,5 +374,71 @@ describe("App", () => {
     renderRoute("/levels");
 
     expect(await screen.findByText("关卡数据加载失败")).toBeInTheDocument();
+  });
+
+  it("renders an empty mistakes page", () => {
+    renderRoute("/mistakes");
+
+    expect(screen.getByRole("heading", { name: "错题本" })).toBeInTheDocument();
+    expect(screen.getByText("暂无错题记录")).toBeInTheDocument();
+  });
+
+  it("renders mistake records from localStorage", () => {
+    localStorage.setItem(
+      "codebot-mistakes",
+      JSON.stringify([
+        {
+          id: "mistake-1",
+          levelId: "level-003",
+          levelTitle: "能量门",
+          knowledgePoint: "if else、>=",
+          code: "if (energy > 60) { printf(\"open\"); }",
+          errorType: "wrong_answer",
+          message: "部分测试未通过",
+          diagnosis: "程序可以运行，但输出结果和题目要求不一致。",
+          score: 67,
+          time: "2026-06-20T14:00:00.000Z"
+        }
+      ])
+    );
+
+    renderRoute("/mistakes");
+
+    expect(screen.getByText("能量门")).toBeInTheDocument();
+    expect(screen.getByText("if else、>=")).toBeInTheDocument();
+    expect(screen.getByText("wrong_answer")).toBeInTheDocument();
+    expect(screen.getByText("得分：67")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "展开" }));
+
+    expect(screen.getByText("程序可以运行，但输出结果和题目要求不一致。")).toBeInTheDocument();
+    expect(screen.getByText(/if \(energy > 60\)/)).toBeInTheDocument();
+  });
+
+  it("clears all mistake records", () => {
+    localStorage.setItem(
+      "codebot-mistakes",
+      JSON.stringify([
+        {
+          id: "mistake-1",
+          levelId: "level-003",
+          levelTitle: "能量门",
+          knowledgePoint: "if else、>=",
+          code: "int main(){return 0;}",
+          errorType: "wrong_answer",
+          message: "部分测试未通过",
+          diagnosis: "输出不一致。",
+          score: 67,
+          time: "2026-06-20T14:00:00.000Z"
+        }
+      ])
+    );
+
+    renderRoute("/mistakes");
+
+    fireEvent.click(screen.getByRole("button", { name: "清空错题本" }));
+
+    expect(screen.getByText("暂无错题记录")).toBeInTheDocument();
+    expect(localStorage.getItem("codebot-mistakes")).toBe("[]");
   });
 });

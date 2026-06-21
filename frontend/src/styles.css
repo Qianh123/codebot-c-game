@@ -370,6 +370,25 @@ h1 {
   color: #8a2f2f;
 }
 
+.diagnosis-box {
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid #d9c58a;
+  border-radius: 8px;
+  background: #fff9e8;
+}
+
+.diagnosis-box h3 {
+  margin: 0 0 8px;
+  color: #6f5418;
+  font-size: 0.98rem;
+}
+
+.diagnosis-box p {
+  margin: 8px 0 0;
+  color: #4f452d;
+}
+
 .judge-results {
   display: grid;
   gap: 12px;
@@ -504,6 +523,86 @@ h1 {
 
 .game-map-error .obstacle {
   outline: 3px solid #d98a8a;
+}
+
+.mistakes-section,
+.mistake-list {
+  display: grid;
+  gap: 16px;
+}
+
+.mistakes-toolbar,
+.mistake-card-header,
+.mistake-meta,
+.mistake-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mistakes-toolbar {
+  padding: 16px;
+  border: 1px solid #d7dfd3;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.mistakes-toolbar button,
+.mistake-actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #2f6f68;
+}
+
+.mistake-actions .secondary-action {
+  color: #172320;
+  background: #d8e1d3;
+}
+
+.mistake-card {
+  padding: 18px;
+  border: 1px solid #d7dfd3;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.mistake-card h2,
+.mistake-detail h3 {
+  margin: 0;
+}
+
+.mistake-card p {
+  color: #4e5a4f;
+  line-height: 1.6;
+}
+
+.mistake-card-header span,
+.mistake-meta span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #173c38;
+  background: #d8e1d3;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.mistake-detail {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.mistake-detail pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+  color: #dce8d7;
+  background: #101510;
+  border-radius: 8px;
+  line-height: 1.6;
 }
 
 .editor-placeholder {

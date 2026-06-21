@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { runCCode, submitLevel } from "../api/code";
+import {
+  ApiRequestError,
+  runCCode,
+  submitLevel,
+  type SubmitLevelResponse
+} from "../api/code";
 import { fetchLevelDetail } from "../api/levels";
 import { ActionButtons } from "../components/ActionButtons";
 import { CodeEditorPanel } from "../components/CodeEditorPanel";
@@ -8,8 +13,30 @@ import { GameMap, type GameMapStatus } from "../components/GameMap";
 import { HintPanel } from "../components/HintPanel";
 import { ResultPanel, type ResultPanelResult } from "../components/ResultPanel";
 import type { LevelDetail } from "../types/level";
+import { generateErrorDiagnosis } from "../utils/errorDiagnosis";
+import { saveMistake } from "../utils/mistakes";
 
 const networkErrorMessage = "无法连接后端，请确认 npm run dev 正在运行。";
+
+function createRecordId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function isSubmitLevelResponse(value: unknown): value is SubmitLevelResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "passed" in value &&
+    "score" in value &&
+    "errorType" in value &&
+    "message" in value &&
+    "results" in value
+  );
+}
 
 export function LevelDetailPage() {
   const { id } = useParams();
@@ -77,13 +104,15 @@ export function LevelDetailPage() {
 
       setResult({
         kind: "run",
-        data: runResult
+        data: runResult,
+        code
       });
       setMapStatus(runResult.status === "success" ? "success" : "error");
     } catch {
       setResult({
         kind: "network_error",
         source: "run",
+        code,
         message: networkErrorMessage
       });
       setMapStatus("error");
@@ -101,18 +130,55 @@ export function LevelDetailPage() {
     setResult(null);
     setMapStatus("running");
 
+    function handleSubmitResult(submitResult: SubmitLevelResponse) {
+      setResult({
+        kind: "submit",
+        data: submitResult,
+        code
+      });
+      setMapStatus(submitResult.passed ? "success" : "error");
+
+      if (!submitResult.passed && level) {
+        const diagnosis = generateErrorDiagnosis({
+          errorType: submitResult.errorType ?? "wrong_answer",
+          stderr: submitResult.stderr,
+          code,
+          message: submitResult.message,
+          results: submitResult.results
+        });
+
+        saveMistake({
+          id: createRecordId(),
+          levelId: level.id,
+          levelTitle: level.title,
+          knowledgePoint: level.knowledgePoint,
+          code,
+          errorType: submitResult.errorType ?? "wrong_answer",
+          message: submitResult.message,
+          diagnosis,
+          score: submitResult.score,
+          time: new Date().toISOString()
+        });
+      }
+    }
+
     try {
       const submitResult = await submitLevel(id, code);
 
-      setResult({
-        kind: "submit",
-        data: submitResult
-      });
-      setMapStatus(submitResult.passed ? "success" : "error");
-    } catch {
+      handleSubmitResult(submitResult);
+    } catch (submitError) {
+      if (
+        submitError instanceof ApiRequestError &&
+        isSubmitLevelResponse(submitError.data)
+      ) {
+        handleSubmitResult(submitError.data);
+        return;
+      }
+
       setResult({
         kind: "network_error",
         source: "submit",
+        code,
         message: networkErrorMessage
       });
       setMapStatus("error");
@@ -158,6 +224,9 @@ export function LevelDetailPage() {
         <Link to="/levels" className="text-link">
           返回关卡列表
         </Link>
+        <Link to="/mistakes" className="text-link">
+          错题本
+        </Link>
         <p className="error-text">{error || "关卡不存在"}</p>
       </main>
     );
@@ -168,6 +237,9 @@ export function LevelDetailPage() {
       <header className="page-header detail-header">
         <Link to="/levels" className="text-link">
           返回关卡列表
+        </Link>
+        <Link to="/mistakes" className="text-link">
+          错题本
         </Link>
         <p className="eyebrow">{level.chapter}</p>
         <h1>{level.title}</h1>
