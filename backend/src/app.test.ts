@@ -68,6 +68,30 @@ describe("GET /api/levels/:id", () => {
     }
   });
 
+  it("first ten levels include complete explanations for self learning", async () => {
+    for (let index = 1; index <= 10; index += 1) {
+      const levelId = `level-${String(index).padStart(3, "0")}`;
+      const response = await request(app).get(`/api/levels/${levelId}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.explanation).toEqual(
+        expect.objectContaining({
+          concept: expect.any(String),
+          syntax: expect.any(String),
+          executionSteps: expect.any(Array),
+          commonMistakes: expect.any(Array),
+          referenceSolution: expect.stringContaining("#include <stdio.h>"),
+          extraPractice: expect.any(Array)
+        })
+      );
+      expect(response.body.explanation.concept.length).toBeGreaterThan(20);
+      expect(response.body.explanation.syntax.length).toBeGreaterThan(10);
+      expect(response.body.explanation.executionSteps.length).toBeGreaterThanOrEqual(3);
+      expect(response.body.explanation.commonMistakes.length).toBeGreaterThanOrEqual(3);
+      expect(response.body.explanation.extraPractice.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
   it("returns 404 when the level does not exist", async () => {
     const response = await request(app).get("/api/levels/not-exist");
 

@@ -7,6 +7,15 @@ export type LevelSummary = {
   description: string;
 };
 
+export type LevelExplanation = {
+  concept: string;
+  syntax: string;
+  executionSteps: string[];
+  commonMistakes: string[];
+  referenceSolution: string;
+  extraPractice: string[];
+};
+
 export type LevelDetail = LevelSummary & {
   inputFormat: string;
   outputFormat: string;
@@ -24,4 +33,5 @@ export type LevelDetail = LevelSummary & {
     output: string;
     action: string;
   }>;
+  explanation?: LevelExplanation;
 };

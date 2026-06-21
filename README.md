@@ -25,6 +25,7 @@ C 语言入门学习常见问题包括语法错误难理解、边界条件容易
 - 中文错误诊断
 - 错题本 localStorage 持久化
 - 学习进度 localStorage 持久化
+- 关卡知识讲解和参考答案折叠展示
 - 教师数据面板 mock 统计
 
 ## 技术栈
@@ -348,6 +349,32 @@ curl -X POST http://localhost:3001/api/submit-level \
 
 新增关卡的数据集中维护在 `backend/src/data/levels.ts`，前端通过 `/api/levels` 和 `/api/levels/:id` 获取关卡，不在页面中写死完整关卡内容。
 
+## 关卡知识讲解说明
+
+第十二阶段新增了每关知识点讲解系统。当前已为 `level-001` 到 `level-010` 补充完整讲解内容，覆盖：
+
+- 知识点概念说明
+- 核心语法格式
+- 程序执行步骤
+- 初学者常见错误
+- 参考答案代码
+- 变式练习
+
+讲解数据维护在关卡详情的 `explanation` 字段中，结构如下：
+
+```ts
+explanation: {
+  concept: string;
+  syntax: string;
+  executionSteps: string[];
+  commonMistakes: string[];
+  referenceSolution: string;
+  extraPractice: string[];
+}
+```
+
+关卡详情页会在练习区下方显示“知识讲解”。参考答案默认隐藏，点击“显示参考答案”后展开，再次点击可以收起。这样可以先鼓励学生独立完成，再在卡住时查看答案对照。
+
 ## 判题流程
 
 1. 根据 `levelId` 查找关卡。
@@ -477,6 +504,7 @@ curl -X POST http://localhost:3001/api/submit-level \
 
 - Replit 部署配置进一步固化。
 - 更完整的机器人动画反馈。
+- 为 `level-011` 到 `level-020` 补全同质量知识讲解。
 - 更丰富的关卡内容和章节体系。
 - 更细粒度的错误诊断规则。
 - 后端沙箱隔离方案。

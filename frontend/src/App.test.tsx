@@ -192,7 +192,25 @@ const levelDetail = {
     "#include <stdio.h>\n\nint main(void) {\n    // 在这里输出内容\n    return 0;\n}",
   hints: ["使用 printf 输出固定文本。", "注意输出内容大小写。"],
   tests: [{ name: "输出问候", input: "", expectedOutput: "Hello CodeBot" }],
-  animationRules: [{ output: "Hello CodeBot", action: "wake" }]
+  animationRules: [{ output: "Hello CodeBot", action: "wake" }],
+  explanation: {
+    concept:
+      "printf 用来把文字输出到屏幕。本关要练习固定文本输出，输出内容必须和题目要求完全一致。",
+    syntax: 'printf("Hello CodeBot");',
+    executionSteps: [
+      "程序从 main 函数开始执行。",
+      "执行 printf 语句，把双引号中的文字输出到屏幕。",
+      "return 0 表示程序正常结束。"
+    ],
+    commonMistakes: [
+      "忘记在语句末尾写分号。",
+      "把 Hello CodeBot 的大小写写错。",
+      "额外输出了提示文字，导致答案不匹配。"
+    ],
+    referenceSolution:
+      '#include <stdio.h>\n\nint main(void) {\n    printf("Hello CodeBot");\n    return 0;\n}',
+    extraPractice: ["输出 Welcome CodeBot。", "输出两行不同的问候语。"]
+  }
 };
 
 const level003Detail = {
@@ -545,6 +563,15 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("输出一行 Hello CodeBot")).toBeInTheDocument();
     expect(screen.getByText("Hello CodeBot")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "知识讲解" })).toBeInTheDocument();
+    expect(screen.getByText("本关知识点说明")).toBeInTheDocument();
+    expect(screen.getByText(/printf 用来把文字输出到屏幕/)).toBeInTheDocument();
+    expect(screen.getByText("语法格式")).toBeInTheDocument();
+    expect(screen.getByText('printf("Hello CodeBot");')).toBeInTheDocument();
+    expect(screen.getByText("程序执行步骤")).toBeInTheDocument();
+    expect(screen.getByText("常见错误")).toBeInTheDocument();
+    expect(screen.getByText("变式练习")).toBeInTheDocument();
+    expect(screen.queryByText(/先自己写，卡住后再看/)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "错题本" })).toHaveAttribute(
       "href",
       "/mistakes"
@@ -575,6 +602,15 @@ describe("App", () => {
     fireEvent.click(screen.getByRole("button", { name: "提示" }));
 
     expect(screen.getByText("已经没有更多提示")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "显示参考答案" }));
+
+    expect(screen.getByText(/先自己写，卡住后再看/)).toBeInTheDocument();
+    expect(screen.getAllByText(/printf\("Hello CodeBot"\);/).length).toBeGreaterThanOrEqual(2);
+
+    fireEvent.click(screen.getByRole("button", { name: "隐藏参考答案" }));
+
+    expect(screen.queryByText(/先自己写，卡住后再看/)).not.toBeInTheDocument();
     expect(globalThis.fetch).toHaveBeenCalledWith("/api/levels/level-001");
   });
 

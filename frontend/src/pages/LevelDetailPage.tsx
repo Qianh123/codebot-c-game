@@ -56,6 +56,8 @@ export function LevelDetailPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasRestoredLastCode, setHasRestoredLastCode] = useState(false);
+  const [isReferenceSolutionVisible, setIsReferenceSolutionVisible] =
+    useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -78,6 +80,7 @@ export function LevelDetailPage() {
           setVisibleHintCount(0);
           setHasRequestedExtraHint(false);
           setHasRestoredLastCode(Boolean(savedProgress?.lastCode));
+          setIsReferenceSolutionVisible(false);
           setMapStatus("idle");
         }
       })
@@ -332,6 +335,78 @@ export function LevelDetailPage() {
           />
         </div>
       </section>
+
+      {level.explanation ? (
+        <section className="workspace-panel explanation-panel">
+          <div className="panel-heading">
+            <h2>知识讲解</h2>
+            <span>{level.knowledgePoint}</span>
+          </div>
+
+          <div className="explanation-content">
+            <section>
+              <h3>本关知识点说明</h3>
+              <p>{level.explanation.concept}</p>
+            </section>
+
+            <section>
+              <h3>语法格式</h3>
+              <pre>{level.explanation.syntax}</pre>
+            </section>
+
+            <section>
+              <h3>程序执行步骤</h3>
+              <ol>
+                {level.explanation.executionSteps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </section>
+
+            <section>
+              <h3>常见错误</h3>
+              <ul>
+                {level.explanation.commonMistakes.map((mistake) => (
+                  <li key={mistake}>{mistake}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section>
+              <h3>变式练习</h3>
+              <ul>
+                {level.explanation.extraPractice.map((practice) => (
+                  <li key={practice}>{practice}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="reference-solution">
+              <div className="reference-heading">
+                <h3>参考答案</h3>
+                <button
+                  type="button"
+                  className="secondary-action"
+                  onClick={() =>
+                    setIsReferenceSolutionVisible((current) => !current)
+                  }
+                >
+                  {isReferenceSolutionVisible ? "隐藏参考答案" : "显示参考答案"}
+                </button>
+              </div>
+
+              {isReferenceSolutionVisible ? (
+                <>
+                  <p className="muted-text">
+                    建议先自己写，卡住后再看参考答案，并对照每一步理解程序如何执行。
+                  </p>
+                  <pre>{level.explanation.referenceSolution}</pre>
+                </>
+              ) : null}
+            </section>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

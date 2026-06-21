@@ -10,6 +10,15 @@ export type AnimationRule = {
   action: string;
 };
 
+export type LevelExplanation = {
+  concept: string;
+  syntax: string;
+  executionSteps: string[];
+  commonMistakes: string[];
+  referenceSolution: string;
+  extraPractice: string[];
+};
+
 export type Level = {
   id: string;
   title: string;
@@ -24,6 +33,7 @@ export type Level = {
   starterCode: string;
   hints: string[];
   tests: LevelTest[];
+  explanation?: LevelExplanation;
   animationRules: AnimationRule[];
 };
 
@@ -35,6 +45,328 @@ export type LevelSummary = Pick<
 const includeStdio = `#include <stdio.h>
 
 `;
+
+const levelExplanations: Record<string, LevelExplanation> = {
+  "level-001": {
+    concept:
+      "printf 是 C 语言中最常用的输出函数。本关练习固定文本输出，程序不需要读取输入，只要把题目要求的文字原样输出即可。",
+    syntax: `printf("要输出的文字");`,
+    executionSteps: [
+      "程序从 main 函数开始执行。",
+      "执行 printf 语句，把双引号中的文字输出到屏幕。",
+      "执行 return 0，表示程序正常结束。"
+    ],
+    commonMistakes: [
+      "忘记在 printf 语句末尾写分号。",
+      "把 Hello CodeBot 的大小写或空格写错。",
+      "额外输出中文提示、标点或换行说明，导致和标准答案不一致。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    printf("Hello CodeBot");
+    return 0;
+}`,
+    extraPractice: [
+      "把输出内容改成 Welcome CodeBot，并观察输出是否完全一致。",
+      "尝试输出两行文字，理解 \\n 的换行作用。"
+    ]
+  },
+  "level-002": {
+    concept:
+      "int 用来保存整数，scanf 用来从标准输入读取数据，printf 用来输出数据。本关练习把输入的整数保存到变量后再原样输出。",
+    syntax: `int energy;
+scanf("%d", &energy);
+printf("%d", energy);`,
+    executionSteps: [
+      "定义 int 类型变量 energy，用来存放输入的整数。",
+      "scanf 根据 %d 读取一个整数，并通过 &energy 写入变量。",
+      "printf 使用 %d 把 energy 当前保存的值输出。"
+    ],
+    commonMistakes: [
+      "scanf 读取普通变量时忘记写 &energy。",
+      "scanf 或 printf 中的格式符写成 %f、%c 等错误类型。",
+      "输出时额外添加说明文字，例如 energy=75，导致答案不匹配。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int energy;
+    scanf("%d", &energy);
+    printf("%d", energy);
+    return 0;
+}`,
+    extraPractice: [
+      "输入一个整数 age，并输出这个整数。",
+      "输入一个负整数，确认程序也能原样输出。"
+    ]
+  },
+  "level-003": {
+    concept:
+      "if else 用来根据条件选择不同的执行路径。本关核心是判断 energy 是否大于等于 60，特别要注意 60 这个边界值也应该输出 open。",
+    syntax: `if (energy >= 60) {
+    printf("open");
+} else {
+    printf("close");
+}`,
+    executionSteps: [
+      "先读取整数 energy。",
+      "判断条件 energy >= 60 是否成立。",
+      "条件成立时执行 if 分支输出 open，否则执行 else 分支输出 close。"
+    ],
+    commonMistakes: [
+      "把 >= 写成 >，导致 energy 等于 60 时判断错误。",
+      "把比较运算符 == 写成赋值运算符 =。",
+      "输出 open 或 close 时大小写不一致，或多输出空格。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int energy;
+    scanf("%d", &energy);
+
+    if (energy >= 60) {
+        printf("open");
+    } else {
+        printf("close");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "把门槛改成 100，输入 score >= 100 时输出 full。",
+      "判断温度 temp 是否小于 0，小于 0 输出 freeze，否则输出 safe。"
+    ]
+  },
+  "level-004": {
+    concept:
+      "for 循环适合执行固定次数的重复操作。本关输入 n 后，需要重复输出 n 行 move，循环次数必须和 n 一致。",
+    syntax: `for (int i = 0; i < n; i++) {
+    printf("move\\n");
+}`,
+    executionSteps: [
+      "读取整数 n，表示需要重复的次数。",
+      "从 i = 0 开始循环，只要 i < n 就继续执行。",
+      "每次循环输出一行 move，然后 i 加 1，直到循环结束。"
+    ],
+    commonMistakes: [
+      "循环条件写成 i <= n，导致多输出一行。",
+      "忘记在 move 后输出换行，导致多行输出挤在一起。",
+      "没有考虑 n 为 0 时不应该输出任何内容。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("move");
+        if (i < n - 1) {
+            printf("\\n");
+        }
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入 n，输出 n 行 CodeBot。",
+      "输入 n，输出从 0 到 n - 1 的数字。"
+    ]
+  },
+  "level-005": {
+    concept:
+      "数组可以保存一组同类型数据。求最大值时，通常先假设第一个元素最大，再逐个比较后面的元素并更新最大值。",
+    syntax: `int boxes[5];
+int max = boxes[0];
+if (boxes[i] > max) {
+    max = boxes[i];
+}`,
+    executionSteps: [
+      "用数组 boxes 保存 5 个输入整数。",
+      "把 boxes[0] 作为初始最大值 max。",
+      "从下标 1 到 4 遍历数组，如果当前元素更大，就更新 max。",
+      "遍历结束后输出 max。"
+    ],
+    commonMistakes: [
+      "把 max 初始值写成 0，遇到全是负数的输入会出错。",
+      "数组下标写到 boxes[5]，越过了合法范围 0 到 4。",
+      "只比较了部分元素，漏掉最后一个数。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int boxes[5];
+
+    for (int i = 0; i < 5; i++) {
+        scanf("%d", &boxes[i]);
+    }
+
+    int max = boxes[0];
+    for (int i = 1; i < 5; i++) {
+        if (boxes[i] > max) {
+            max = boxes[i];
+        }
+    }
+
+    printf("%d", max);
+    return 0;
+}`,
+    extraPractice: [
+      "输入 5 个整数，输出第二个元素。",
+      "输入 5 个整数，统计其中大于 0 的个数。"
+    ]
+  },
+  "level-006": {
+    concept:
+      "一个程序可以一次读取多个变量。整数加法使用 + 运算符，本关把两个输入整数相加后输出结果。",
+    syntax: `int a, b;
+scanf("%d %d", &a, &b);
+printf("%d", a + b);`,
+    executionSteps: [
+      "定义两个 int 变量 a 和 b。",
+      "scanf 按顺序读取两个整数，分别存入 a 和 b。",
+      "计算表达式 a + b，并用 printf 输出计算结果。"
+    ],
+    commonMistakes: [
+      "scanf 中有两个 %d，却只传了一个变量地址。",
+      "忘记给 a 或 b 加 &，导致读取失败或运行错误。",
+      "输出了 a 和 b 本身，而不是输出 a + b 的结果。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int a, b;
+    scanf("%d %d", &a, &b);
+    printf("%d", a + b);
+    return 0;
+}`,
+    extraPractice: [
+      "输入两个整数，输出它们的差 a - b。",
+      "输入三个整数，输出它们的和。"
+    ]
+  },
+  "level-007": {
+    concept:
+      "double 用来保存小数。计算圆面积时需要使用乘法表达式，输出时可以用 %.2f 控制保留两位小数。",
+    syntax: `double r;
+scanf("%lf", &r);
+printf("%.2f", 3.14 * r * r);`,
+    executionSteps: [
+      "读取半径 r，使用 double 保存小数。",
+      "根据公式 3.14 * r * r 计算面积。",
+      "使用 %.2f 输出面积，保留两位小数。"
+    ],
+    commonMistakes: [
+      "scanf 读取 double 时把 %lf 写成 %f。",
+      "把 r * r 写成 r + r，公式使用错误。",
+      "忘记使用 %.2f，导致输出小数位数不符合题目要求。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    double r;
+    scanf("%lf", &r);
+
+    double area = 3.14 * r * r;
+    printf("%.2f", area);
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入长和宽，输出矩形面积，保留两位小数。",
+      "输入一个小数 x，输出 x 的平方，保留两位小数。"
+    ]
+  },
+  "level-008": {
+    concept:
+      "char 用来保存单个字符。读取字符时使用 %c，输出字符时也使用 %c。本关只需要读入一个字符并原样输出。",
+    syntax: `char cmd;
+scanf(" %c", &cmd);
+printf("%c", cmd);`,
+    executionSteps: [
+      "定义 char 变量 cmd 保存一个字符。",
+      "scanf 使用 %c 读取字符，前面的空格可以跳过换行和空白。",
+      "printf 使用 %c 输出 cmd 中保存的字符。"
+    ],
+    commonMistakes: [
+      "把字符变量写成 int 或字符串数组，增加不必要复杂度。",
+      "scanf 读取字符时忘记 &cmd。",
+      "使用 %d 输出字符，导致显示的是字符编码而不是字符本身。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    char cmd;
+    scanf(" %c", &cmd);
+    printf("%c", cmd);
+    return 0;
+}`,
+    extraPractice: [
+      "输入一个字符，如果是 A 就输出 A。",
+      "输入两个字符，分别输出在两行。"
+    ]
+  },
+  "level-009": {
+    concept:
+      "取模运算 % 可以得到整数除法的余数。判断奇偶时，只需要看 n % 2 是否等于 0。",
+    syntax: `if (n % 2 == 0) {
+    printf("even");
+} else {
+    printf("odd");
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "计算 n % 2，得到 n 除以 2 的余数。",
+      "余数为 0 时输出 even，否则输出 odd。"
+    ],
+    commonMistakes: [
+      "把 n % 2 == 0 写成 n / 2 == 0，混淆除法和取模。",
+      "在 if 条件中把 == 写成 =。",
+      "把 0 判断成 odd，导致偶数边界错误。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    if (n % 2 == 0) {
+        printf("even");
+    } else {
+        printf("odd");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入整数 n，判断它是否能被 3 整除。",
+      "输入整数 n，如果 n 是偶数输出 0，否则输出 1。"
+    ]
+  },
+  "level-010": {
+    concept:
+      "多分支判断可以处理三种或更多情况。本关需要分别判断正数、负数和零，三个分支的顺序要清楚。",
+    syntax: `if (n > 0) {
+    printf("positive");
+} else if (n < 0) {
+    printf("negative");
+} else {
+    printf("zero");
+}`,
+    executionSteps: [
+      "读取整数 n。",
+      "先判断 n 是否大于 0，成立则输出 positive。",
+      "如果不是正数，再判断 n 是否小于 0，成立则输出 negative。",
+      "前两个条件都不成立时，n 只能是 0，输出 zero。"
+    ],
+    commonMistakes: [
+      "只写 if 和 else，漏掉 zero 的单独情况。",
+      "把 n < 0 写成 n <= 0，导致 0 被判断成 negative。",
+      "多个 if 没有用 else if 连接，可能让逻辑变得混乱。"
+    ],
+    referenceSolution: `${includeStdio}int main(void) {
+    int n;
+    scanf("%d", &n);
+
+    if (n > 0) {
+        printf("positive");
+    } else if (n < 0) {
+        printf("negative");
+    } else {
+        printf("zero");
+    }
+
+    return 0;
+}`,
+    extraPractice: [
+      "输入温度，判断 hot、cold 或 normal。",
+      "输入成绩，判断 pass 或 fail，并单独处理满分。"
+    ]
+  }
+};
 
 export const levels: Level[] = [
   {
@@ -64,6 +396,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：固定文本", input: "", expectedOutput: "Hello CodeBot", hidden: true },
       { name: "隐藏测试：无输入输出", input: "", expectedOutput: "Hello CodeBot", hidden: true }
     ],
+    explanation: levelExplanations["level-001"],
     animationRules: [{ output: "Hello CodeBot", action: "wake" }]
   },
   {
@@ -94,6 +427,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：零电量", input: "0", expectedOutput: "0", hidden: true },
       { name: "隐藏测试：负数输入", input: "-5", expectedOutput: "-5", hidden: true }
     ],
+    explanation: levelExplanations["level-002"],
     animationRules: [{ output: "75", action: "charge" }]
   },
   {
@@ -124,6 +458,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：边界值 60", input: "60", expectedOutput: "open", hidden: true },
       { name: "隐藏测试：零电量", input: "0", expectedOutput: "close", hidden: true }
     ],
+    explanation: levelExplanations["level-003"],
     animationRules: [
       { output: "open", action: "open-door" },
       { output: "close", action: "stop" }
@@ -157,6 +492,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：不移动", input: "0", expectedOutput: "", hidden: true },
       { name: "隐藏测试：移动五次", input: "5", expectedOutput: "move\nmove\nmove\nmove\nmove", hidden: true }
     ],
+    explanation: levelExplanations["level-004"],
     animationRules: [{ output: "move", action: "step" }]
   },
   {
@@ -187,6 +523,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：全是负数", input: "-7 -2 -9 -4 -5", expectedOutput: "-2", hidden: true },
       { name: "隐藏测试：最大值重复", input: "6 6 1 2 3", expectedOutput: "6", hidden: true }
     ],
+    explanation: levelExplanations["level-005"],
     animationRules: [{ output: "9", action: "collect-max-box" }]
   },
   {
@@ -217,6 +554,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：和为零", input: "-4 4", expectedOutput: "0", hidden: true },
       { name: "隐藏测试：两个零", input: "0 0", expectedOutput: "0", hidden: true }
     ],
+    explanation: levelExplanations["level-006"],
     animationRules: [{ output: "8", action: "merge-energy" }]
   },
   {
@@ -247,6 +585,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：半径为 0", input: "0", expectedOutput: "0.00", hidden: true },
       { name: "隐藏测试：半径为 10", input: "10", expectedOutput: "314.00", hidden: true }
     ],
+    explanation: levelExplanations["level-007"],
     animationRules: [{ output: "12.56", action: "draw-field" }]
   },
   {
@@ -277,6 +616,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：数字字符", input: "7", expectedOutput: "7", hidden: true },
       { name: "隐藏测试：符号字符", input: "#", expectedOutput: "#", hidden: true }
     ],
+    explanation: levelExplanations["level-008"],
     animationRules: [{ output: "A", action: "read-command" }]
   },
   {
@@ -307,6 +647,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：零", input: "0", expectedOutput: "even", hidden: true },
       { name: "隐藏测试：负奇数", input: "-5", expectedOutput: "odd", hidden: true }
     ],
+    explanation: levelExplanations["level-009"],
     animationRules: [{ output: "even", action: "even-path" }]
   },
   {
@@ -337,6 +678,7 @@ export const levels: Level[] = [
       { name: "隐藏测试：零", input: "0", expectedOutput: "zero", hidden: true },
       { name: "隐藏测试：一", input: "1", expectedOutput: "positive", hidden: true }
     ],
+    explanation: levelExplanations["level-010"],
     animationRules: [{ output: "positive", action: "forward" }]
   },
   {

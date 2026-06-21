@@ -557,6 +557,69 @@ h1 {
   font-weight: 700;
 }
 
+.explanation-panel {
+  margin-top: 20px;
+}
+
+.explanation-content {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.explanation-content section {
+  display: grid;
+  gap: 10px;
+}
+
+.explanation-content h3 {
+  margin: 0;
+  color: #173c38;
+  font-size: 1rem;
+}
+
+.explanation-content p,
+.explanation-content li {
+  color: #4e5a4f;
+  line-height: 1.65;
+}
+
+.explanation-content p,
+.explanation-content ol,
+.explanation-content ul {
+  margin: 0;
+}
+
+.explanation-content ol,
+.explanation-content ul {
+  padding-left: 22px;
+}
+
+.explanation-content pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+  color: #dce8d7;
+  background: #101510;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.reference-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reference-heading button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #172320;
+  background: #d8e1d3;
+}
+
 .game-map {
   padding: 16px;
   border: 1px solid #cdd8d2;
