@@ -138,6 +138,13 @@ describe("App", () => {
       "href",
       "/teacher-dashboard"
     );
+    expect(screen.getByText("核心功能")).toBeInTheDocument();
+    expect(screen.getByText("C 代码编辑")).toBeInTheDocument();
+    expect(screen.getByText("在线编译运行")).toBeInTheDocument();
+    expect(screen.getByText("自动判题")).toBeInTheDocument();
+    expect(screen.getByText("错误诊断")).toBeInTheDocument();
+    expect(screen.getAllByText("错题本").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("教师数据面板")).toBeInTheDocument();
   });
 
   it("renders the teacher dashboard page", () => {
